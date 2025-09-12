@@ -9,7 +9,6 @@ import lombok.Data;
 @Data
 public class Conta {
     String idConta;
-    String agencia;
     int numero;
     double saldo;
 

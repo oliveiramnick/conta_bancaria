@@ -5,6 +5,6 @@ import lombok.Data;
 
 @Entity
 @Data
-public class ContaPoupanca {
+public class ContaPoupanca extends Conta {
     double rendimento;
 }

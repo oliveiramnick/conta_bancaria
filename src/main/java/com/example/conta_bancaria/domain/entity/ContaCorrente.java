@@ -5,7 +5,7 @@ import lombok.Data;
 
 @Entity
 @Data
-public class ContaCorrente {
+public class ContaCorrente extends Conta {
     Long limite;
     double taxa;
 }

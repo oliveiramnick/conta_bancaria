@@ -12,6 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.Optional;
 
+
 @Service
 @Transactional
 public class ClienteService {
@@ -25,7 +26,7 @@ public class ClienteService {
         return clienteRepository.findAll()
                 .stream()
                 .map(ClienteDTO::fromEntity)
-                .orElse(null);
+                .toList();
     }
     @Transactional(readOnly = true)
     public ClienteDTO buscarClientePorId(String id) {
@@ -43,9 +44,20 @@ public class ClienteService {
         Optional<Cliente> clienteExistenteOpt = clienteRepository.findById(id);
 
         Cliente existente = clienteExistenteOpt.get();
+        existente.setIdCliente(dto.idCliente());
         existente.setNome(dto.nome());
         existente.setCpf(dto.cpf());
-        existente.setContas(dto.contas());
 
+        if (dto.idConta() != null) {
+            Optional<Conta> contaOpt = contaRepository.findById(dto.idConta());
+            contaOpt.ifPresent(conta -> existente.setContas(List.of(conta)));
+        } else {
+            existente.setContas(null);
+        }
+        Cliente atualizado = clienteRepository.save(existente);
+        return ClienteDTO.fromEntity(atualizado);
+    }
+    public void deletarCliente(String id) {
+        clienteRepository.deleteById(id);
     }
 }
