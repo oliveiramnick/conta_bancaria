@@ -1,19 +1,40 @@
 package com.example.conta_bancaria.domain.entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
+import jakarta.persistence.*;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
+
+import java.math.BigDecimal;
 
 @Entity
 @Data
-public class Conta {
-    String idConta;
-    int numero;
-    double saldo;
+@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
+@DiscriminatorColumn(name = "tipo_conta", discriminatorType = DiscriminatorType.STRING, length = 20)
+@Table(name = "conta", uniqueConstraints = {
+        @UniqueConstraint(name = "uk_conta_numero", columnNames = "numero"),
+        @UniqueConstraint(name = "uk_cliente_tipo", columnNames = {"cliente_id", "tipo_conta"})
+        })
+@SuperBuilder
+@NoArgsConstructor
 
-    @ManyToOne
-    @JoinColumn(name="id_cliente")
+public abstract class Conta {
+    @Id
+    @GeneratedValue(strategy = GenerationType.UUID)
+    private String idConta;
+
+    @Column(nullable = false, length = 20)
+    private int numero;
+
+    @Column(nullable = false, precision= 20, scale = 2)
+    private BigDecimal saldo;
+
+    @Column(nullable = false)
+    private boolean ativa;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name="cliente_id", foreignKey = @ForeignKey(name = "fk_conta_cliente"))
     private Cliente cliente;
 
 }

@@ -9,7 +9,7 @@ import java.util.List;
 public record ClienteDTO(
         String idCliente,
         String nome,
-        Long cpf,
+        String cpf,
         String idConta
 )
 {

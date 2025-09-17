@@ -2,11 +2,15 @@ package com.example.conta_bancaria.aplication.dto;
 
 import com.example.conta_bancaria.domain.entity.Cliente;
 import com.example.conta_bancaria.domain.entity.Conta;
+import com.example.conta_bancaria.domain.entity.ContaCorrente;
+import com.example.conta_bancaria.domain.entity.ContaPoupanca;
+
+import java.math.BigDecimal;
 
 public record ContaDTO(
         String idCliente,
         String idConta,
-        Double saldo
+        BigDecimal saldo
 ) {
     // Java
     public static ContaDTO fromEntity(Conta conta){
@@ -20,7 +24,7 @@ public record ContaDTO(
     }
 
     public Conta toEntity(Cliente cliente){
-        Conta conta = new Conta();
+        Conta conta;
         conta.setCliente(cliente);
         conta.setIdConta(this.idConta());
         conta.setSaldo(this.saldo());
