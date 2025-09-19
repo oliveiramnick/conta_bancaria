@@ -1,6 +1,5 @@
 package com.example.conta_bancaria.aplication.service;
 
-import com.example.conta_bancaria.aplication.dto.ClienteDTO;
 import com.example.conta_bancaria.aplication.dto.ContaDTO;
 import com.example.conta_bancaria.domain.entity.Cliente;
 import com.example.conta_bancaria.domain.entity.Conta;

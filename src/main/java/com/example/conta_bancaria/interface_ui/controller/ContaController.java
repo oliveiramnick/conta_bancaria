@@ -1,10 +1,7 @@
 package com.example.conta_bancaria.interface_ui.controller;
 
-import com.example.conta_bancaria.aplication.dto.ClienteDTO;
 import com.example.conta_bancaria.aplication.dto.ContaDTO;
-import com.example.conta_bancaria.aplication.service.ClienteService;
 import com.example.conta_bancaria.aplication.service.ContaService;
-import com.example.conta_bancaria.domain.entity.Conta;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
