@@ -12,32 +12,5 @@ import java.util.List;
 @RequestMapping("/conta")
 public class ContaController {
 
-    @Autowired
-    ContaService contaService;
-
-    @GetMapping
-    public List<ContaDTO> listarContas() {
-        return contaService.listarContas();
-    }
-
-    @GetMapping("/{id}")
-    public ContaDTO buscarContaPorId(@PathVariable String id) {
-        return contaService.buscarContaPorId(id);
-    }
-
-    @PostMapping("/{id}")
-    public ContaDTO atualizarConta(@PathVariable String id, @RequestBody ContaDTO contaDTO) {
-        return contaService.atualizarConta(id, contaDTO);
-    }
-
-    @PostMapping
-    public ContaDTO salvarConta(@RequestBody ContaDTO contaDTO) {
-        return contaService.salvarConta(contaDTO);
-    }
-
-    @DeleteMapping("/{id}")
-    public void deletarConta(@PathVariable String id) {
-        contaService.deletarConta(id);
-    }
 }
 

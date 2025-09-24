@@ -25,7 +25,7 @@ public abstract class Conta {
     private String idConta;
 
     @Column(nullable = false, length = 20)
-    private int numero;
+    private String numero;
 
     @Column(nullable = false, precision= 20, scale = 2)
     private BigDecimal saldo;
@@ -36,5 +36,7 @@ public abstract class Conta {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="cliente_id", foreignKey = @ForeignKey(name = "fk_conta_cliente"))
     private Cliente cliente;
+
+    public abstract String getTipo();
 
 }

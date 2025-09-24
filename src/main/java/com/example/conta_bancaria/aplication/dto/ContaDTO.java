@@ -12,23 +12,7 @@ public record ContaDTO(
         String idConta,
         BigDecimal saldo
 ) {
-    // Java
-    public static ContaDTO fromEntity(Conta conta){
-        if (conta == null) return null;
-        String idCliente = conta.getCliente() != null ? conta.getCliente().getIdCliente() : null;
-        return new ContaDTO(
-                idCliente,
-                conta.getIdConta(),
-                conta.getSaldo()
-        );
-    }
 
-    public Conta toEntity(Cliente cliente){
-        Conta conta;
-        conta.setCliente(cliente);
-        conta.setIdConta(this.idConta());
-        conta.setSaldo(this.saldo());
-        return conta;
-    }
+
 
 }
