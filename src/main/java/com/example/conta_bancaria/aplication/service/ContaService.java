@@ -7,6 +7,8 @@ import com.example.conta_bancaria.aplication.dto.ValorSaqueDepositoDTO;
 import com.example.conta_bancaria.domain.entity.Conta;
 import com.example.conta_bancaria.domain.entity.ContaCorrente;
 import com.example.conta_bancaria.domain.entity.ContaPoupanca;
+import com.example.conta_bancaria.domain.exceptions.EntidadeNaoEncontradaException;
+import com.example.conta_bancaria.domain.exceptions.RendimentoInvalidoException;
 import com.example.conta_bancaria.domain.repository.ContaRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -32,7 +34,7 @@ public class ContaService {
     public ContaResumoDTO buscarContaPorNumero(String numero) {
         return ContaResumoDTO.fromEntity(
                 repository.findByNumeroAndAtivaTrue(numero)
-                        .orElseThrow(() -> new RuntimeException("Conta não encontrada"))
+                        .orElseThrow(() -> new EntidadeNaoEncontradaException("Conta"))
         );
     }
     public ContaResumoDTO atualizarConta(String numeroDaConta, ContaAtualizacaoDTO dto){
@@ -57,7 +59,7 @@ public class ContaService {
 
     private Conta buscarContaAtivaPorNumero(String numeroDaConta) {
         var conta = repository.findByNumeroAndAtivaTrue(numeroDaConta).orElseThrow(
-                () -> new RuntimeException("Conta não encontrada.")
+                () -> new EntidadeNaoEncontradaException("Conta")
         );
         return conta;
     }
@@ -89,6 +91,6 @@ public class ContaService {
             poupanca.aplicarRendimento();
             return ContaResumoDTO.fromEntity(repository.save(conta));
         }
-        throw new IllegalArgumentException("Rendimento apenas para conta poupança");
+        throw new RendimentoInvalidoException();
     }
 }

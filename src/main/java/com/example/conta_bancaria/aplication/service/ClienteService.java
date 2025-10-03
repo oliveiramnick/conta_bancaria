@@ -2,6 +2,7 @@ package com.example.conta_bancaria.aplication.service;
 
 import com.example.conta_bancaria.aplication.dto.ClienteRegistroDTO;
 import com.example.conta_bancaria.aplication.dto.ClienteResponseDTO;
+import com.example.conta_bancaria.domain.exceptions.EntidadeNaoEncontradaException;
 import com.example.conta_bancaria.domain.repository.ClienteRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -44,14 +45,14 @@ public class ClienteService {
 
     public ClienteResponseDTO buscarClienteAtivoPorCpf(String cpf) {
         var cliente = repository.findByCpfAndAtivoTrue(cpf).orElseThrow(
-                () -> new RuntimeException("Cliente não encontrado.")
+                () -> new EntidadeNaoEncontradaException("Cliente")
         );
         return ClienteResponseDTO.fromEntity(cliente);
     }
 
     public ClienteResponseDTO atualizarCliente(String cpf, ClienteRegistroDTO dto) {
         var cliente = repository.findByCpfAndAtivoTrue(cpf).orElseThrow(
-                () -> new RuntimeException("Cliente não encontrado.")
+                () -> new EntidadeNaoEncontradaException("Cliente")
         );
         cliente.setNome(dto.nome());
         cliente.setCpf(dto.cpf());
@@ -62,7 +63,7 @@ public class ClienteService {
 
     public void deletarCliente(String cpf) {
         var cliente = repository.findByCpfAndAtivoTrue(cpf).orElseThrow(
-                () -> new RuntimeException("Cliente não encontrado.")
+                () -> new EntidadeNaoEncontradaException("Cliente")
         );
         cliente.setAtivo(false);
         cliente.getContas().forEach(
