@@ -27,7 +27,7 @@ public abstract class Conta {
     @Column(nullable = false, length = 20)
     private String numero;
 
-    @Column(nullable = false, precision= 20, scale = 2)
+    @Column(nullable = false, precision= 22, scale = 2)
     private BigDecimal saldo;
 
     @Column(nullable = false)
@@ -63,5 +63,6 @@ public abstract class Conta {
             throw new IllegalArgumentException("O valor da operação deve ser maior que zero.");
         }
     }
+
 
 }
