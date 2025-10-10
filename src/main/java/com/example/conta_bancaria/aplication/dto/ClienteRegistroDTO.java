@@ -4,9 +4,9 @@ import com.example.conta_bancaria.domain.entity.Cliente;
 import com.example.conta_bancaria.domain.entity.Conta;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import org.springframework.context.annotation.Role;
 
 import java.util.ArrayList;
-import java.util.List;
 
 
 public record ClienteRegistroDTO(
@@ -16,6 +16,7 @@ public record ClienteRegistroDTO(
         String cpf,
         @NotBlank
         ContaResumoDTO contaDTO
+        Role role;
 )
 {
     public Cliente toEntity (){
