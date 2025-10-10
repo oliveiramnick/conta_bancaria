@@ -3,6 +3,7 @@ package com.example.conta_bancaria.interface_ui.controller;
 import com.example.conta_bancaria.aplication.dto.ClienteRegistroDTO;
 import com.example.conta_bancaria.aplication.dto.ClienteResponseDTO;
 import com.example.conta_bancaria.aplication.service.ClienteService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -23,7 +24,7 @@ public class ClienteController {
     private final ClienteService service;
 
     @PostMapping
-    public ResponseEntity <ClienteResponseDTO> registrarCliente(@RequestBody ClienteRegistroDTO dto) {
+    public ResponseEntity <ClienteResponseDTO> registrarCliente(@RequestBody @Valid ClienteRegistroDTO dto) {
         ClienteResponseDTO novoCliente = service.registrarClienteOuAnexarConta(dto);
         return ResponseEntity.created(
                 URI.create("api/cliente/cpf"+novoCliente.cpf())
@@ -38,7 +39,7 @@ public class ClienteController {
         return ResponseEntity.ok(service.buscarClienteAtivoPorCpf(cpf));
     }
     @PutMapping("/{cpf}")
-    public ResponseEntity<ClienteResponseDTO> atualizarCliente(@PathVariable String cpf, @RequestBody ClienteRegistroDTO dto){
+    public ResponseEntity<ClienteResponseDTO> atualizarCliente(@PathVariable String cpf, @RequestBody @Valid ClienteRegistroDTO dto){
         return ResponseEntity.ok(service.atualizarCliente(cpf,dto));
     }
     @DeleteMapping("/cpf/{cpf}")
