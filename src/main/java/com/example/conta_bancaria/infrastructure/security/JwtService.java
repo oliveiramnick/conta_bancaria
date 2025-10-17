@@ -1,4 +1,4 @@
-package com.senai.modelo_autenticacao_autorizacao.infrastructure.security;
+package com.example.conta_bancaria.infrastructure.security;
 
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;

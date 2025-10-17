@@ -1,6 +1,8 @@
-package com.senai.modelo_autenticacao_autorizacao.infrastructure.security;
+package com.example.conta_bancaria.infrastructure.security;
 
-import com.senai.modelo_autenticacao_autorizacao.domain.repository.UsuarioRepository;
+import com.example.conta_bancaria.domain.entity.Usuario;
+import com.example.conta_bancaria.domain.exceptions.EntidadeNaoEncontradaException;
+import com.example.conta_bancaria.domain.repository.UsuarioRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
@@ -18,11 +20,11 @@ public class UsuarioDetailsService implements UserDetailsService {
     private final UsuarioRepository repository;
 
     @Override
-    public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
+    public UserDetails loadUserByUsername(String email) throws EntidadeNaoEncontradaException {
         var usuario = repository.findByEmail(email)
-                .orElseThrow(() -> new UsernameNotFoundException("Usuário não encontrado"));
+                .orElseThrow(() -> new EntidadeNaoEncontradaException("Usuário não encontrado"));
 
-        return new User(
+        return new Usuario(
                 usuario.getEmail(),
                 usuario.getSenha(),
                 List.of(new SimpleGrantedAuthority("ROLE_" + usuario.getRole().name()))

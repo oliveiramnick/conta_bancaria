@@ -1,4 +1,4 @@
-package com.senai.modelo_autenticacao_autorizacao.infrastructure.security;
+package com.example.conta_bancaria.infrastructure.security;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -18,8 +18,8 @@ import java.io.IOException;
 @RequiredArgsConstructor
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
-    private final JwtService jwtService;
-    private final UsuarioDetailsService userDetailsService;
+    private final com.example.conta_bancaria.infrastructure.security.JwtService jwtService;
+    private final com.example.conta_bancaria.infrastructure.security.UsuarioDetailsService userDetailsService;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request,
