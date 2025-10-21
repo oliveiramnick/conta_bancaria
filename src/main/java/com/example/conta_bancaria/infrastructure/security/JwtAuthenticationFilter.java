@@ -18,8 +18,8 @@ import java.io.IOException;
 @RequiredArgsConstructor
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
-    private final com.example.conta_bancaria.infrastructure.security.JwtService jwtService;
-    private final com.example.conta_bancaria.infrastructure.security.UsuarioDetailsService userDetailsService;
+    private final JwtService jwtService;
+    private final UsuarioDetailsService userDetailsService;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request,
@@ -56,7 +56,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             }
         }
 
-        filterChain.doFilter(request, response);
-    }
+        filterChain.doFilter(request, response
 }
 

@@ -5,6 +5,8 @@ import com.example.conta_bancaria.domain.entity.Gerente;
 import com.example.conta_bancaria.domain.enums.Role;
 import com.example.conta_bancaria.domain.repository.GerenteRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -17,18 +19,18 @@ public class GerenteService {
     private final PasswordEncoder encoder;
 
     @PreAuthorize("hasAnyRole('ADMIN','GERENTE')")
-    public List<GerenteDTO> listarTodosProfessores() {
+    public List<GerenteDTO> listarTodosGerentes() {
         return Repository.findAll().stream()
                 .map(GerenteDTO::fromEntity)
                 .toList();
     }
 
 
-    @PreAuthorize("hasAnyRole('ADMIN')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'CLIENTE")")
     public GerenteDTO cadastrarGerente(GerenteDTO dto) {
         Gerente entity = dto.toEntity();
         entity.setSenha(encoder.encode(dto.senha()));
-        entity.setRole(Role.GERENTE);
+        entity.setRole(Role.CLIENTE);
         gerenteRepository.save(entity);
         return GerenteDTO.fromEntity(entity);
     }

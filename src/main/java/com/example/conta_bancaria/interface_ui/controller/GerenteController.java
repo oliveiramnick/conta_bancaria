@@ -21,7 +21,7 @@ public class GerenteController {
     }
 
     @PostMapping
-    public ResponseEntity<GerenteDTO> cadastrarProfessor(@RequestBody GerenteDTO dto) {
+    public ResponseEntity<GerenteDTO> cadastrarGerente(@RequestBody GerenteDTO dto) {
         GerenteDTO gerenteCriado = service.cadastrarGerente(dto);
         return ResponseEntity.ok(gerenteCriado);
     }

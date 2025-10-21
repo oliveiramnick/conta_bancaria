@@ -24,26 +24,35 @@ public class ClienteController {
     private final ClienteService service;
 
     @PostMapping
-    public ResponseEntity <ClienteResponseDTO> registrarCliente(@RequestBody @Valid ClienteRegistroDTO dto) {
+    public ResponseEntity<ClienteResponseDTO> registrarCliente(
+            @RequestBody @Valid ClienteRegistroDTO dto
+    ) {
         ClienteResponseDTO novoCliente = service.registrarClienteOuAnexarConta(dto);
         return ResponseEntity.created(
-                URI.create("api/cliente/cpf"+novoCliente.cpf())
+                URI.create("/api/cliente/cpf/" + novoCliente.cpf())
         ).body(novoCliente);
     }
+
     @GetMapping
-    public ResponseEntity<List<ClienteResponseDTO>>listarClientesAtivos(){
+    public ResponseEntity<List<ClienteResponseDTO>> listarClientesAtivos() {
         return ResponseEntity.ok(service.listarClientesAtivos());
     }
+
     @GetMapping("/cpf/{cpf}")
-    public ResponseEntity<ClienteResponseDTO> buscarClienteAtivoPorCpf(@PathVariable String cpf){
+    public ResponseEntity<ClienteResponseDTO> buscarClienteAtivoPorCpf(@PathVariable String cpf) {
         return ResponseEntity.ok(service.buscarClienteAtivoPorCpf(cpf));
     }
-    @PutMapping("/{cpf}")
-    public ResponseEntity<ClienteResponseDTO> atualizarCliente(@PathVariable String cpf, @RequestBody @Valid ClienteRegistroDTO dto){
-        return ResponseEntity.ok(service.atualizarCliente(cpf,dto));
+
+    @PutMapping("/cpf/{cpf}")
+    public ResponseEntity<ClienteResponseDTO> atualizarCliente(
+            @PathVariable String cpf,
+            @RequestBody @Valid ClienteRegistroDTO dto
+    ) {
+        return ResponseEntity.ok(service.atualizarCliente(cpf, dto));
     }
+
     @DeleteMapping("/cpf/{cpf}")
-    public ResponseEntity<Void> deletarCliente(@PathVariable String cpf){
+    public ResponseEntity<Void> deletarCliente(@PathVariable String cpf) {
         service.deletarCliente(cpf);
         return ResponseEntity.noContent().build();
     }
