@@ -15,8 +15,8 @@ public record ClienteRegistroDTO(
         @NotNull
         String cpf,
         @NotBlank
-        ContaResumoDTO contaDTO
-        Role role;
+        ContaResumoDTO contaDTO,
+        Role role
 )
 {
     public Cliente toEntity (){

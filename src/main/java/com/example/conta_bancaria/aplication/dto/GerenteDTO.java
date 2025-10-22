@@ -10,8 +10,8 @@ public record GerenteDTO(
         String nome,
         String cpf,
         String email,
-        String senha,
         Boolean ativo,
+        String senha,
         Role role
 ) {
     public static GerenteDTO fromEntity(Gerente gerente) {
@@ -33,7 +33,7 @@ public record GerenteDTO(
                 .email(this.email)
                 .senha(this.senha)
                 .ativo(this.ativo != null ? this.ativo : true)
-                .role(this.role != null ? this.role : Role.GERENTE)
+                .role(this.role != null ? this.role : Role.CLIENTE)
                 .build();
     }
 }

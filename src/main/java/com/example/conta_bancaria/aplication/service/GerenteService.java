@@ -20,13 +20,13 @@ public class GerenteService {
 
     @PreAuthorize("hasAnyRole('ADMIN','GERENTE')")
     public List<GerenteDTO> listarTodosGerentes() {
-        return Repository.findAll().stream()
+        return gerenteRepository.findAll().stream()
                 .map(GerenteDTO::fromEntity)
                 .toList();
     }
 
 
-    @PreAuthorize("hasAnyRole('ADMIN', 'CLIENTE")")
+    @PreAuthorize("hasAnyRole('ADMIN', 'CLIENTE")
     public GerenteDTO cadastrarGerente(GerenteDTO dto) {
         Gerente entity = dto.toEntity();
         entity.setSenha(encoder.encode(dto.senha()));

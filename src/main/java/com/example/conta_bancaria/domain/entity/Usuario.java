@@ -1,5 +1,6 @@
 package com.example.conta_bancaria.domain.entity;
 
+import com.example.conta_bancaria.domain.enums.Role;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
