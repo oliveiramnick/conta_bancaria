@@ -29,9 +29,9 @@ public record ClienteResponseDTO(
         return new ClienteResponseDTO(
                 cliente.getId(),
                 cliente.getNome(),
-                cliente.getCpf(),
                 cliente.getEmail(),
                 cliente.getSenha(),
+                cliente.getCpf(),
                 contas
         );
     }
