@@ -8,10 +8,9 @@ import lombok.experimental.SuperBuilder;
 @Getter
 @Setter
 @NoArgsConstructor
-@AllArgsConstructor
 @SuperBuilder
 @Entity
 @Table(name = "gerentes")
-public class Gerente extends Usuario{
+public class Gerente extends Usuario {
 
 }

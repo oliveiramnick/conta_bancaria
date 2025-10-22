@@ -24,7 +24,7 @@ public class UsuarioDetailsService implements UserDetailsService {
         var usuario = repository.findByEmail(email)
                 .orElseThrow(() -> new EntidadeNaoEncontradaException("Usuário não encontrado"));
 
-        return new Usuario(
+        return new User(
                 usuario.getEmail(),
                 usuario.getSenha(),
                 List.of(new SimpleGrantedAuthority("ROLE_" + usuario.getRole().name()))

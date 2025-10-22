@@ -20,7 +20,7 @@ public record ClienteResponseDTO(
                 .map(ContaResumoDTO::fromEntity)
                 .toList();
         return new ClienteResponseDTO(
-                cliente.getIdCliente(),
+                cliente.getId(),
                 cliente.getNome(),
                 cliente.getCpf(),
                 contas

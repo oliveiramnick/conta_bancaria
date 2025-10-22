@@ -7,6 +7,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
 
 import java.util.List;
 
@@ -14,26 +15,15 @@ import java.util.List;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@Builder
+@SuperBuilder
 @Table(
         name = "cliente",
         uniqueConstraints = @UniqueConstraint(name = "uk_cliente_cpf", columnNames = "cpf")
 )
-public class Cliente {
+public class Cliente extends Usuario{
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    private String idCliente;
-
-    @Column(nullable = false, length = 120)
-    private String nome;
-
-    @Column(nullable = false, length = 11)
-    private String cpf;
 
     @OneToMany(mappedBy = "cliente", cascade = CascadeType.ALL)
     private List<Conta> contas;
 
-    @Column(nullable = false)
-    private boolean ativo;
 }

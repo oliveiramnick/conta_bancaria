@@ -14,6 +14,10 @@ public record ClienteRegistroDTO(
         String nome,
         @NotNull
         String cpf,
+        @NotNull
+        String email,
+        @NotNull
+        String senha,
         @NotBlank
         ContaResumoDTO contaDTO,
         Role role
@@ -24,6 +28,8 @@ public record ClienteRegistroDTO(
                 .ativo(true)
                 .nome(this.nome)
                 .cpf(this.cpf)
+                .email(this.email)
+                .senha(this.senha)
                 .contas(new ArrayList<Conta>())
                 .build();
     }
