@@ -2,6 +2,7 @@ package com.example.conta_bancaria.aplication.dto;
 
 import com.example.conta_bancaria.domain.entity.Cliente;
 import com.example.conta_bancaria.domain.entity.Conta;
+import org.hibernate.validator.constraints.br.CPF; // Importa a anotação @CPF
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import org.springframework.context.annotation.Role;
