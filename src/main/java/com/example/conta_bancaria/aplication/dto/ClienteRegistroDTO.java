@@ -20,7 +20,7 @@ public record ClienteRegistroDTO(
         String email,
         @NotNull
         String senha,
-        @NotBlank
+        @NotNull
         ContaResumoDTO contaDTO,
         Role role
 )
