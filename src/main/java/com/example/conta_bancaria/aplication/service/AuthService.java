@@ -17,14 +17,18 @@ public class AuthService {
     private final PasswordEncoder encoder;
     private final JwtService jwt;
 
-    public String login(AuthDTO.LoginRequest req) {
-        Usuario usuario = usuarios.findByEmail(req.email())
-                .orElseThrow(() ->  new UsuarioNaoEncontradoException("Usuário não encontrado"));
 
+    public String login(AuthDTO.LoginRequest req) {
+        // Busca o usuário pelo e-mail no repositório
+        Usuario usuario = usuarios.findByEmail(req.email())
+                .orElseThrow(() -> new UsuarioNaoEncontradoException("Usuário não encontrado"));
+
+        // Valida a senha usando o PasswordEncoder
         if (!encoder.matches(req.senha(), usuario.getSenha())) {
             throw new BadCredentialsException("Credenciais inválidas");
         }
 
+        // Gera e retorna o token JWT contendo e-mail e role do usuário
         return jwt.generateToken(usuario.getEmail(), usuario.getRole().name());
     }
 }

@@ -16,8 +16,8 @@ public class SwaggerConfig {
                         .description("Cadastro e gestão de serviços de uma Conta Bancária.")
                         .version("1.0")
                         .contact(new Contact()
-                                .name("Equipe Oficina")
-                                .email("suporte@oficina.com"))
+                                .name("Equipe Bancária")
+                                .email("suporte@banco.com"))
                 );
     }
 }
