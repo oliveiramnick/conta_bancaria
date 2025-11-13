@@ -37,8 +37,7 @@ public class Pagamento {
     @JoinColumn(name = "conta_id", nullable = false)
     private Conta conta;
 
-    @ManyToOne
-    @JoinColumn(name = "taxa_id", nullable = true)
+    @ManyToMany
     private Set<Taxa> taxa;
 
 }

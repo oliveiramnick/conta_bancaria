@@ -9,13 +9,19 @@ import com.example.conta_bancaria.domain.exceptions.SaldoInsuficienteException;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDateTime;
 import java.util.Set;
 
 @Service
 public class PagamentoDomainService {
     public BigDecimal calcularValorTotal(Pagamento pagamento) {
+        // Variáveis de configuração declaradas localmente
+        final int SCALE = 2;
+        final RoundingMode ROUNDING_MODE = RoundingMode.HALF_UP;
+
         BigDecimal valorBase = pagamento.getValorPago();
+        // Assumindo que o getter correto seja getTaxas()
         Set<Taxa> taxas = pagamento.getTaxa();
         BigDecimal totalTaxas = BigDecimal.ZERO;
 
@@ -25,13 +31,13 @@ public class PagamentoDomainService {
 
                 // 1. Cálculo da Taxa Percentual
                 if (taxa.getPercentual() != null && taxa.getPercentual().compareTo(BigDecimal.ZERO) > 0) {
-                    // Assume que getPercentual() retorna 0.05 para 5%
                     valorTaxaPercentual = valorBase
                             .multiply(taxa.getPercentual())
                             .setScale(SCALE, ROUNDING_MODE);
                 }
 
                 // 2. Cálculo da Taxa Fixa
+                // Se getValorFixo() for null, usa BigDecimal.ZERO
                 BigDecimal valorTaxaFixa = taxa.getValorFixo() != null ?
                         taxa.getValorFixo().setScale(SCALE, ROUNDING_MODE) :
                         BigDecimal.ZERO;
@@ -58,17 +64,16 @@ public class PagamentoDomainService {
         Conta conta = pagamento.getConta();
 
         // 2. Validação de Vencimento do Boleto (Regra de Exemplo)
-        // Para simplificar, assumimos que o código do boleto pode conter a data de vencimento.
         // Aqui, apenas validamos se a data do pagamento é no futuro, o que é inválido.
         if (pagamento.getDataPagamento() != null && pagamento.getDataPagamento().isAfter(LocalDateTime.now())) {
             pagamento.setStatus(StatusPagamento.FALHA);
-            throw new PagamentoInvalidoException("Data de pagamento futura inválida.");
+            throw new PagamentoInvalidoException("Data de pagamento inválida.");
         }
 
         // 3. Validação de Saldo Insuficiente
         if (conta.getSaldo().compareTo(valorTotal) < 0) {
             pagamento.setStatus(StatusPagamento.SALDO_INSUFICIENTE);
-            throw new SaldoInsuficienteException();
+            throw new SaldoInsuficienteException(); // Adicionei mensagem de erro
         }
 
         // 4. Débito e Conclusão
@@ -80,5 +85,4 @@ public class PagamentoDomainService {
 
         return pagamento;
     }
-
-}
+   }
