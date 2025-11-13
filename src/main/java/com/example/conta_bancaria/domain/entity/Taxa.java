@@ -13,8 +13,6 @@ import java.math.BigDecimal;
 @NoArgsConstructor
 @Table(name = "taxa")
 
-
-
 public class Taxa {
     @Id
     @GeneratedValue(strategy = jakarta.persistence.GenerationType.UUID)
@@ -25,10 +23,10 @@ public class Taxa {
     private TaxaDescricao descricao;
 
     @Column(nullable = false)
-    private Double percentual;
+    private BigDecimal percentual;
 
     @Column(nullable = false)
-    private Double valorFixo;
+    private BigDecimal valorFixo;
 
 
 }

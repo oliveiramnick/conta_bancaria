@@ -59,6 +59,9 @@ public abstract class Conta {
         this.sacar(valor);
         contaDestino.depositar(valor);
     }
+    public void debitar(BigDecimal valor) {
+        sacar(valor);
+    }
 
     protected static void validarValorMAiorQueZero(BigDecimal valor, String operacao) {
         if (valor.compareTo(BigDecimal.ZERO) < 0) {

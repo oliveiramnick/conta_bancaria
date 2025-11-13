@@ -7,6 +7,8 @@ import jakarta.validation.constraints.Digits;
 import jakarta.validation.constraints.NotNull;
 import lombok.Builder;
 
+import java.math.BigDecimal;
+
 @Schema(
         name = "TaxasDTO",
         description = "DTO para transportar informações de Taxas"
@@ -23,12 +25,12 @@ public record TaxaDTO(
         @Schema(description = "Percentual aplicado à taxa", example = "2.50")
         @NotNull(message = "O percentual não pode ser nulo")
         @Digits(integer = 3, fraction = 2, message = "O percentual deve ter até 3 dígitos inteiros e 2 decimais")
-        Double percentual,
+        BigDecimal percentual,
 
         @Schema(description = "Valor fixo da taxa", example = "20.00")
         @NotNull(message = "O valor fixo não pode ser nulo")
         @Digits(integer = 10, fraction = 2, message = "O valor fixo deve ter até 10 dígitos inteiros e 2 decimais")
-        Double valorFixo
+       BigDecimal valorFixo
 ) {
     public static TaxaDTO fromEntity(Taxa taxas) {
         return TaxaDTO.builder()

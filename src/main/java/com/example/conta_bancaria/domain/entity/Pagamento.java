@@ -8,6 +8,7 @@ import lombok.experimental.SuperBuilder;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Set;
 
 @Entity
 @Data
@@ -23,28 +24,21 @@ public class Pagamento {
     @Column(nullable = false, unique = true)
     private String boleto;
 
-
     @Column(nullable = false, unique = true)
     private LocalDateTime dataPagamento;
 
     @Column(nullable = false)
-    private Double valorPago;
+    private BigDecimal valorPago;
 
     @Column(nullable = false)
     private StatusPagamento status;
 
-
-
-    // Associação com a Conta
     @ManyToOne
     @JoinColumn(name = "conta_id", nullable = false)
     private Conta conta;
 
-    // Associação ManyToOne com Taxa
     @ManyToOne
     @JoinColumn(name = "taxa_id", nullable = true)
-    private Taxa taxa;
+    private Set<Taxa> taxa;
 
-
-    // Métodos de lógica de pagamento podem ser adicionados aqui
 }

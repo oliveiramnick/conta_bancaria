@@ -8,6 +8,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Builder;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Schema(
@@ -29,7 +30,7 @@ public record PagamentoDTO(
         @Schema(description = "Valor do pagamento", example = "150.75")
         @NotNull(message = "O valor do pagamento não pode ser nulo")
         @Digits(integer = 15, fraction = 2, message = "O valor do pagamento deve ter até 15 dígitos inteiros e 2 decimais")
-        Double valorPago,
+        BigDecimal valorPago,
 
         @Schema(description = "Status do pagamento (enum)", example = "PENDENTE")
         @NotNull(message = "O status do pagamento não pode ser nulo")
