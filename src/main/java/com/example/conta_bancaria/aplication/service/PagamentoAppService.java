@@ -1,57 +1,142 @@
 package com.example.conta_bancaria.aplication.service;
 
-import com.example.conta_bancaria.domain.entity.Conta;
-import com.example.conta_bancaria.domain.entity.Pagamento;
-import com.example.conta_bancaria.domain.entity.Taxa;
-import com.example.conta_bancaria.domain.repository.ContaRepository;
-import com.example.conta_bancaria.domain.repository.PagamentoRepository;
-import com.example.conta_bancaria.domain.repository.TaxaRepository;
+import com.example.conta_bancaria.domain.entity.*;
+import com.example.conta_bancaria.domain.exceptions.PagamentoInvalidoException;
+import com.example.conta_bancaria.domain.exceptions.SaldoInsuficienteException;
+import com.example.conta_bancaria.domain.repository.*;
 import jakarta.transaction.Transactional;
 
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.HashSet;
 import java.util.NoSuchElementException;
+import java.util.UUID;
 
 public class PagamentoAppService {
     private final PagamentoRepository pagamentoRepository;
-    private final PagamentoDomainService pagamentoDomainService;
-    private final ContaRepository contaRepository;
     private final TaxaRepository taxaRepository;
+    private final CodigoAutenticacaoRepository codigoRepository;
+    private final DispositivoIoTRepository dispositivoRepository;
+    private final PagamentoDomainService domainService;
+    private final MqttGateway mqtt;
+    private final ContaService contaService;
+    private final ClienteService clienteService;
 
-    public PagamentoAppService(
-            PagamentoRepository pagamentoRepository,
-            PagamentoDomainService pagamentoDomainService,
-            ContaRepository contaRepository,
-            TaxaRepository taxaRepository) {
+    public PagamentoAppService(PagamentoRepository pagamentoRepository,
+                               TaxaRepository taxaRepository,
+                               CodigoAutenticacaoRepository codigoRepository,
+                               DispositivoIoTRepository dispositivoRepository,
+                               PagamentoDomainService domainService,
+                               MqttGateway mqtt,
+                               ContaService contaService,
+                               ClienteService clienteService) {
         this.pagamentoRepository = pagamentoRepository;
-        this.pagamentoDomainService = pagamentoDomainService;
-        this.contaRepository = contaRepository;
         this.taxaRepository = taxaRepository;
+        this.codigoRepository = codigoRepository;
+        this.dispositivoRepository = dispositivoRepository;
+        this.domainService = domainService;
+        this.mqtt = mqtt;
+        this.contaService = contaService;
+        this.clienteService = clienteService;
     }
 
-    // Gerentes cadastram taxas
+    /** Dispara solicitação de autenticação via MQTT e registra o código pendente. */
     @Transactional
-    public Taxa cadastrarTaxa(Taxa taxa) {
-        // Validações básicas de Taxa se necessário
-        return taxaRepository.save(taxa);
+    public CodigoAutenticacao iniciarAutenticacao(String cpf) {
+        Cliente cliente = clienteService.buscarClienteAtivoPorCpf(cpf);
+
+        // Garante que existe dispositivo IoT ativo para esse cliente
+        dispositivoRepository.findByClienteAndAtivoTrue(cliente)
+                .orElseThrow(PagamentoInvalidoException::new);
+
+        // Gera código simples de 6 caracteres
+        String codigo = UUID.randomUUID().toString().substring(0, 6).toUpperCase();
+
+        CodigoAutenticacao auth = new CodigoAutenticacao();
+        auth.setCliente(cliente);
+        auth.setCodigo(codigo);
+        auth.setValidado(false);
+        auth.setExpiraEm(LocalDateTime.now().plusMinutes(2));
+        codigoRepository.save(auth);
+
+        // Envia o código via MQTT
+        String idClienteTopico = String.valueOf(cliente.getId());
+        mqtt.enviarCodigoAutenticacao(idClienteTopico, codigo);
+
+        return auth;
     }
 
-    // Clientes realizam pagamentos
+    /** Validação do código (pelo listener MQTT ou endpoint). */
     @Transactional
-    public Pagamento realizarPagamento(Pagamento pagamento) {
+    public void validarCodigo(String clienteId, String codigo) {
+        Cliente cliente = clienteService.buscarClienteAtivoPorCpf(clienteId);
 
-        // 1. Pré-validação e busca de dados (Conta, Taxas)
-        Conta conta = contaRepository.findById(pagamento.getConta().getIdConta())
-                .orElseThrow(() -> new NoSuchElementException("Conta não encontrada."));
+        CodigoAutenticacao ultimo = codigoRepository.findTopByClienteOrderByIdDesc(cliente)
+                .orElseThrow(AutenticacaoIoTExpiradaException::new);
 
-        // Garante que o objeto Conta e Taxas está no Pagamento para o Domain Service
-        pagamento.setConta(conta);
-        // Em um cenário real, as taxas seriam definidas por uma regra de negócio e buscadas aqui.
-        // Para a demo, assumimos que o objeto Pagamento já vem com as taxas válidas.
+        if (LocalDateTime.now().isAfter(ultimo.getExpiraEm())) {
+            throw new AutenticacaoIoTExpiradaException();
+        }
 
-        // 2. Processamento da Regra de Negócio (Débito e Validações)
-        Pagamento pagamentoProcessado = pagamentoDomainService.processarPagamento(pagamento);
+        if (!ultimo.getCodigo().equals(codigo)) {
+            throw new PagamentoInvalidoException();
+        }
 
-        // 3. Persistência (Pagamento e Conta)
-        Conta contaAtualizada = contaRepository.save(conta); // Persiste o débito
-        return pagamentoRepository.save(pagamentoProcessado); // Persiste o Pagamento
+        ultimo.setValidado(true);
+        codigoRepo.save(ultimo);
+
+        // Opcional: notifica o dispositivo IoT que a validação deu certo
+        String idClienteTopico = String.valueOf(cliente.getId());
+        mqtt.enviarConfirmacaoValidacao(idClienteTopico, codigo);
+    }
+
+    /** Confirma e processa o pagamento após autenticação IoT válida. */
+    @Transactional
+    public Pagamento confirmarPagamento(String contaId,
+                                        String clienteId,
+                                        String boleto,
+                                        LocalDate dataVencimento,
+                                        BigDecimal valorPrincipal,
+                                        List<Long> taxaIds) {
+
+        Cliente cliente = clienteService.buscarPorId(clienteId);
+        Conta conta = contaService.buscarPorId(contaId);
+
+        // Autenticação IoT deve estar válida e dentro do prazo
+        CodigoAutenticacao ultimo = codigoRepo.findTopByClienteOrderByIdDesc(cliente)
+                .orElseThrow(AutenticacaoIoTExpiradaException::new);
+
+        if (!ultimo.isValidado() || LocalDateTime.now().isAfter(ultimo.getExpiraEm())) {
+            throw new AutenticacaoIoTExpiradaException();
+        }
+
+        // Validação de boleto (não permite pagar boleto vencido)
+        if (dataVencimento != null && dataVencimento.isBefore(LocalDate.now())) {
+            throw new PagamentoInvalidoException("Pagamento Inválido");
+        }
+
+        // Monta entidade Pagamento
+        Pagamento p = new Pagamento();
+        p.setConta(conta);
+        p.setBoleto(boleto);
+        p.setValorPago(valorPrincipal);
+        p.setDataPagamento(LocalDateTime.now());
+        p.setTaxa(new HashSet<>(taxaRepository.findAllById(taxaIds)));
+
+        // Calcula valor final (valor + taxas)
+        BigDecimal valorFinal = domainService.calcularValorFinal(p);
+
+        // Tenta sacar — se não houver saldo, salva como SALDO_INSUFICIENTE
+        try {
+            conta.sacar(valorFinal);
+        } catch (SaldoInsuficienteException e) {
+            p.setStatus(StatusPagamento.SALDO_INSUFICIENTE);
+            pagamentoRepository.save(p);
+            throw e;
+        }
+
+        p.setStatus(StatusPagamento.SUCESSO);
+        return pagamentoRepository.save(p);
     }
 }

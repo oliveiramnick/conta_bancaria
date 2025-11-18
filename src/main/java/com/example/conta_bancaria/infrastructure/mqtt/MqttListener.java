@@ -1,0 +1,50 @@
+package com.example.conta_bancaria.infrastructure.mqtt;
+
+import com.example.conta_bancaria.aplication.service.PagamentoAppService;
+import jakarta.annotation.PostConstruct;
+import org.eclipse.paho.client.mqttv3.MqttClient;
+import org.eclipse.paho.client.mqttv3.MqttException;
+import org.springframework.stereotype.Component;
+
+@Component
+public class MqttListener {
+    private final MqttClient client;
+    private final PagamentoAppService pagamentoAppService;
+
+    public MqttListener(MqttClient client, PagamentoAppService pagamentoAppService) {
+        this.client = client;
+        this.pagamentoAppService = pagamentoAppService;
+    }
+
+    @PostConstruct
+    public void init() throws MqttException {
+        if (!client.isConnected()) {
+            client.connect();
+        }
+
+        // Assina todos os tópicos: banco/validacao/{clienteId}
+        client.subscribe("banco/validacao/+", (topic, message) -> {
+            try {
+                // Exemplo de tópico: banco/validacao/1
+                String[] parts = topic.split("/");
+                if (parts.length < 3) {
+                    return; // formato inesperado
+                }
+
+                String clienteId = parts[2];
+                String payload = new String(message.getPayload());
+
+                if (payload.startsWith("CODE:")) {
+                    String codigo = payload.substring(5);
+                    pagamentoAppService.validarCodigo(clienteId, codigo);
+                    System.out.println("Código IoT validado para cliente " + clienteId);
+                }
+
+            } catch (Exception e) {
+                e.printStackTrace(); // em produção, usar logger
+            }
+        });
+
+        System.out.println("MqttListener assinando tópicos: banco/validacao/+");
+    }
+}

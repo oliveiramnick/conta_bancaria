@@ -9,32 +9,60 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.util.List;
+
 public class PagamentoController {
-    private final PagamentoAppService pagamentoAppService;
+    private final PagamentoAppService pagamentos;
 
-    public PagamentoController(PagamentoAppService pagamentoAppService) {
-        this.pagamentoAppService = pagamentoAppService;
+    public PagamentoController(PagamentoAppService pagamentos) {
+        this.pagamentos = pagamentos;
     }
 
     /**
-     * Endpoint para Clientes realizarem pagamentos.
-     * @param pagamento Pagamento com conta, valor e taxas.
+     * Inicia a autenticação via dispositivo IoT para o cliente.
+     * Gera um código, salva no banco e envia via MQTT (banco/autenticacao/{clienteId}).
      */
-    @PostMapping("/pagamentos")
-    @PreAuthorize("hasRole('CLIENTE')") // Apenas Clientes podem pagar
-    public ResponseEntity<Pagamento> realizarPagamento(@RequestBody Pagamento pagamento) {
-        Pagamento novoPagamento = pagamentoAppService.realizarPagamento(pagamento);
-        return new ResponseEntity<>(novoPagamento, HttpStatus.CREATED);
+    @PostMapping("/autenticacao")
+    @PreAuthorize("hasRole('CLIENTE')")
+    public ResponseEntity<?> iniciarAutenticacao(@RequestBody IniciarAutenticacaoRequest req) {
+        var auth = pagamentos.iniciarAutenticacao(req.clienteId);
+        return ResponseEntity.ok(auth);
     }
 
     /**
-     * Endpoint para Gerentes cadastrarem novas taxas.
-     * @param taxa Detalhes da Taxa (descrição, percentual, valorFixo).
+     * Confirma o pagamento após a autenticação IoT ter sido validada.
      */
-    @PostMapping("/taxas")
-    @PreAuthorize("hasRole('GERENTE')") // Apenas Gerentes podem cadastrar taxas
-    public ResponseEntity<Taxa> cadastrarTaxa(@RequestBody Taxa taxa) {
-        Taxa novaTaxa = pagamentoAppService.cadastrarTaxa(taxa);
-        return new ResponseEntity<>(novaTaxa, HttpStatus.CREATED);
+    @PostMapping("/confirmar")
+    @PreAuthorize("hasRole('CLIENTE')")
+    public ResponseEntity<?> confirmar(@RequestBody ConfirmarPagamentoRequest req) {
+        return ResponseEntity.ok(
+                pagamentos.confirmarPagamento(
+                        req.contaId,
+                        req.clienteId,
+                        req.boleto,
+                        (req.dataVencimento == null || req.dataVencimento.isBlank())
+                                ? null
+                                : LocalDate.parse(req.dataVencimento),
+                        (req.valorPrincipal != null ? req.valorPrincipal : BigDecimal.ZERO),
+                        req.idTaxa
+                )
+        );
+    }
+
+    // ===================== DTOs de request (simples) =====================
+
+    public static class IniciarAutenticacaoRequest {
+        public String clienteId;
+    }
+
+    public static class ConfirmarPagamentoRequest {
+        public String contaId;
+        public String clienteId;
+        public String boleto;
+        public String dataVencimento;   // formato: yyyy-MM-dd
+        public BigDecimal valorPrincipal;
+        public List<String> idTaxa;
     }
 }
