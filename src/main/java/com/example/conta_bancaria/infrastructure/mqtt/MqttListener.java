@@ -1,6 +1,6 @@
 package com.example.conta_bancaria.infrastructure.mqtt;
 
-import com.example.conta_bancaria.aplication.service.PagamentoAppService;
+import com.example.conta_bancaria.domain.service.PagamentoAppService;
 import jakarta.annotation.PostConstruct;
 import org.eclipse.paho.client.mqttv3.MqttClient;
 import org.eclipse.paho.client.mqttv3.MqttException;

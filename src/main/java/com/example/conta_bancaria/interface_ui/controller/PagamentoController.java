@@ -1,9 +1,6 @@
 package com.example.conta_bancaria.interface_ui.controller;
 
-import com.example.conta_bancaria.aplication.service.PagamentoAppService;
-import com.example.conta_bancaria.domain.entity.Pagamento;
-import com.example.conta_bancaria.domain.entity.Taxa;
-import org.springframework.http.HttpStatus;
+import com.example.conta_bancaria.domain.service.PagamentoAppService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PostMapping;

@@ -1,6 +1,10 @@
-package com.example.conta_bancaria.aplication.service;
+package com.example.conta_bancaria.domain.service;
 
+import com.example.conta_bancaria.aplication.service.ClienteService;
+import com.example.conta_bancaria.aplication.service.ContaService;
+import com.example.conta_bancaria.aplication.service.PagamentoDomainService;
 import com.example.conta_bancaria.domain.entity.*;
+import com.example.conta_bancaria.domain.exceptions.AutenticacaoIoTExpiradaException;
 import com.example.conta_bancaria.domain.exceptions.PagamentoInvalidoException;
 import com.example.conta_bancaria.domain.exceptions.SaldoInsuficienteException;
 import com.example.conta_bancaria.domain.repository.*;
@@ -10,7 +14,6 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.HashSet;
-import java.util.NoSuchElementException;
 import java.util.UUID;
 
 public class PagamentoAppService {
@@ -122,7 +125,7 @@ public class PagamentoAppService {
         p.setBoleto(boleto);
         p.setValorPago(valorPrincipal);
         p.setDataPagamento(LocalDateTime.now());
-        p.setTaxa(new HashSet<>(taxaRepository.findAllById(taxaIds)));
+        p.setTaxa(new HashSet<>(taxaRepository.findAllById(idTaxa)));
 
         // Calcula valor final (valor + taxas)
         BigDecimal valorFinal = domainService.calcularValorFinal(p);
